@@ -1,0 +1,36 @@
+.formError {
+    display: grid;
+    grid-template-rows: 1fr;
+    padding-top: var(--bias-error-padding-top, 4px);
+    opacity: 1;
+    translate: 0 0;
+    transition:
+        grid-template-rows 300ms,
+        padding 300ms,
+        opacity 300ms,
+        translate 300ms,
+        filter 300ms;
+    transition-timing-function: var(--ease-out-cubic);
+}
+
+.expanderTransitionEnter {
+    grid-template-rows: 0fr;
+    padding-top: 0;
+    opacity: 0;
+    translate: 0 -2px;
+    transition: none;
+}
+
+.expanderTransitionExit {
+    grid-template-rows: 0fr;
+    padding-top: 0;
+    opacity: 0;
+    translate: 0 -2px;
+}
+
+.content {
+    min-height: 0;
+    color: var(--bias-color-error);
+    font-size: 0.875em;
+    font-weight: 500;
+}

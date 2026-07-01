@@ -1,0 +1,89 @@
+{
+    "name": "@biaspay/solid",
+    "version": "0.0.1",
+    "private": false,
+    "description": "SolidJS SDK for Bias Elements",
+    "keywords": [
+        "solid"
+    ],
+    "homepage": "https://biaspay.com",
+    "bugs": {
+        "url": "https://github.com/{{me}}/{{name_of_lib}}/issues"
+    },
+    "license": "MIT",
+    "author": "Bias",
+    "contributors": [],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/{{me}}/{{name_of_lib}}.git"
+    },
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "browser": {},
+    "types": "./dist/index.d.ts",
+    "typesVersions": {},
+    "exports": {
+        "development": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/dev.js"
+            }
+        },
+        "import": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "dev": "vite serve --config dev/vite.config.ts dev --port 3006",
+        "build": "bun run --cwd ../lit build && vite build && vite build --mode development && tsc -p tsconfig.build.json",
+        "test": "concurrently \"bun run test:client\" \"bun run test:ssr\"",
+        "test:client": "vitest",
+        "test:ssr": "vitest --mode ssr",
+        "prepublishOnly": "bun run build",
+        "format": "bun oxfmt -c ../../../oxfmt.config.ts --write .",
+        "lint": "concurrently \"bun run lint:code\" \"bun run lint:types\"",
+        "lint:code": "bunx oxlint . --deny-warnings",
+        "lint:fix": "bun oxlint --fix . && bun format",
+        "lint:types": "tsc --noEmit",
+        "update-deps": "bun update"
+    },
+    "dependencies": {
+        "@biaspay/web": "workspace:*"
+    },
+    "devDependencies": {
+        "@biaspay/server": "workspace:*",
+        "@solidjs/web": "2.0.0-beta.7",
+        "@steeze-ui/heroicons": "^2.4.2",
+        "@types/node": "^25.9.3",
+        "@vitest/browser": "^4.1.8",
+        "@vitest/browser-playwright": "^4.1.8",
+        "concurrently": "^10.0.3",
+        "esbuild": "^0.28.1",
+        "jsdom": "^29.1.1",
+        "oxfmt": "^0.54.0",
+        "playwright": "^1.60.0",
+        "solid-js": "2.0.0-beta.7",
+        "typescript": "^6.0.3",
+        "vite": "^7.3.5",
+        "vite-plugin-solid": "^3.0.0-next.5",
+        "vitest": "^4.1.8"
+    },
+    "peerDependencies": {
+        "@solidjs/web": "2.0.0-beta.7",
+        "solid-js": "2.0.0-beta.7"
+    },
+    "overrides": {
+        "@solidjs/web": "2.0.0-beta.7",
+        "solid-js": "2.0.0-beta.7"
+    },
+    "engines": {
+        "bun": ">=1.3.11",
+        "node": ">=18"
+    },
+    "packageManager": "bun@1.3.14"
+}

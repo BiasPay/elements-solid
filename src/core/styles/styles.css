@@ -1,0 +1,45 @@
+@property --slide-progress {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 1;
+}
+
+@layer bias {
+    :root {
+        --bias-color-primary: #0073e6;
+        --bias-color-background: #ffffff;
+        --bias-color-input: #ffffff;
+        --bias-color-success: #16a34a;
+        --bias-color-error: #e53e3e;
+        --bias-color-foreground: rgba(0 0 0 / 0.85);
+        --bias-color-muted-foreground: rgba(0 0 0 / 0.6);
+        --bias-color-border: #e0e0e0;
+        --bias-shadow: 0px 1px 1px rgba(0 0 0 / 0.02), 0px 3px 6px rgba(0 0 0 / 0.02);
+        --bias-color-placeholder: rgba(0 0 0 / 0.5);
+        --bias-border-radius: 8px;
+        --bias-font-family: system-ui, sans-serif;
+        --bias-font-size: 1rem;
+
+        --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+        --ease-cubic-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+        --ease-in-out-smooth: cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .bias,
+    .bias * {
+        font-family: var(--bias-font-family);
+        box-sizing: border-box;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .bias,
+        .bias *,
+        .bias *::before,
+        .bias *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}

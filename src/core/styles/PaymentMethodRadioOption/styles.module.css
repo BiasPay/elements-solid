@@ -1,0 +1,146 @@
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--bias-color-border);
+    border-right: 1px solid var(--bias-color-border);
+    background-color: var(--bias-color-background);
+}
+
+.selectedVariantSelected {
+    z-index: 10;
+}
+
+.selectedVariantNotSelected {
+    &:hover {
+        z-index: 10;
+    }
+}
+
+.first {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-top: 1px solid var(--bias-color-border);
+}
+
+.notFirst {
+    border-top: 1px solid var(--bias-color-border);
+}
+
+.last {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom: 1px solid var(--bias-color-border);
+}
+
+.headerButton {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.625rem;
+    padding-inline: 1.125rem;
+    padding-block: 0.875rem;
+    background: transparent;
+    border: none;
+    outline: none;
+    transition: color 200ms;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.headerButtonCursorSelected {
+    color: var(--bias-color-foreground);
+    cursor: default;
+    font-weight: 500;
+}
+
+.headerButtonCursorNotSelected {
+    color: var(--bias-color-muted-foreground);
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: default;
+    pointer-events: none;
+}
+
+.hoverBackground {
+    position: absolute;
+    inset: 0.25rem;
+    z-index: -10;
+    border-radius: 0.375rem;
+    background-color: color-mix(in srgb, black 4%, transparent);
+    opacity: 0;
+    transition-property: opacity, transform;
+    transition-duration: 150ms;
+}
+
+.headerButton:hover .hoverBackground {
+    opacity: 1;
+}
+
+.headerButton:active .hoverBackground {
+    transform: scaleX(0.988) scaleY(0.86);
+}
+
+.iconContainer {
+    display: flex;
+    width: 1.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconSize {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.labelContainer {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.label {
+    font-size: 0.9375rem;
+}
+
+.contentWrapper {
+    display: grid;
+    overflow: clip;
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition-property: grid-template-rows, translate, opacity;
+    transition-duration: 500ms;
+    transition-timing-function: var(--ease-in-out-smooth);
+}
+
+.contentWrapperVisibilityHidden {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    translate: 0 -3px;
+
+    @starting-style {
+        grid-template-rows: 0fr;
+        opacity: 0;
+        translate: 0 -3px;
+    }
+}
+
+.contentWrapperVisibilityVisible {
+}
+
+.contentInner {
+    min-height: 0;
+    padding-inline: 1rem;
+}
+
+.contentInner > * {
+    padding-top: 0.25rem;
+    padding-bottom: 1rem;
+}

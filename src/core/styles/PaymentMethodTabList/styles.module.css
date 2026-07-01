@@ -1,0 +1,25 @@
+.tabListContainer {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabBar {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 2px;
+    margin: -2px;
+
+    @container (max-width: 300px) {
+        flex-direction: column;
+    }
+}
+
+.tabPanels {
+    display: grid;
+    overflow-y: clip;
+    transition-property: height;
+    transition-duration: 350ms;
+    transition-timing-function: var(--ease-in-out-smooth);
+}

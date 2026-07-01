@@ -1,0 +1,48 @@
+.labelContainer {
+    position: relative;
+    margin-bottom: 0;
+    display: grid;
+    width: 1rem;
+    height: 1rem;
+    place-items: center;
+    border-radius: 9999px;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition-property: all;
+    transition-duration: 250ms;
+    transition-timing-function: ease-out;
+    border: 1px solid #d4d4d4;
+    background-color: white;
+
+    &::after {
+        content: "";
+        transform: scale(0.5);
+    }
+}
+
+.selectedVariantSelected {
+    outline-offset: -5px;
+    outline-width: 5px;
+    outline-style: solid;
+    outline-color: var(--bias-color-foreground);
+}
+
+.selectedVariantNotSelected {
+    outline-offset: 0px;
+    outline-width: 0px;
+    outline-style: solid;
+    outline-color: transparent;
+}
+
+.disabled {
+    opacity: 0.6;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+.input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+}

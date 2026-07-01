@@ -1,0 +1,18 @@
+.root {
+    display: grid;
+    align-items: center;
+}
+
+.select {
+    grid-column: 1;
+    grid-row: 1;
+    cursor: pointer;
+}
+
+.icon {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+    margin-inline-end: 0.675rem;
+}

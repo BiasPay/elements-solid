@@ -1,0 +1,97 @@
+.tabBar {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tabContent {
+    display: grid;
+    transition-property: height;
+    transition-duration: 350ms;
+    transition-timing-function: var(--ease-in-out-smooth);
+}
+
+.tab {
+    position: relative;
+    isolation: isolate;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding-block: 0.75rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--bias-color-border);
+    border-radius: var(--bias-border-radius, 10px);
+    background-color: var(--bias-color-background);
+    cursor: pointer;
+    outline: none;
+    transition:
+        border-color 150ms,
+        box-shadow 150ms,
+        color 150ms;
+    color: var(--bias-color-muted-foreground);
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.tabVariantSelected {
+    border-color: var(--bias-color-primary);
+    box-shadow: 0 0 0 1px var(--bias-color-primary);
+    color: var(--bias-color-foreground);
+    font-weight: 500;
+    cursor: default;
+}
+
+.tabVariantNotSelected {
+    &:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--bias-color-border) 50%,
+            var(--bias-color-foreground)
+        );
+    }
+}
+
+.disabled {
+    cursor: default;
+    pointer-events: none;
+}
+
+.iconSize {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.label {
+    font-size: 0.8125rem;
+    line-height: 1;
+}
+
+.contentPanel {
+    grid-column-start: 1;
+    grid-row-start: 1;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 350ms;
+    transition-timing-function: var(--ease-in-out-smooth);
+}
+
+.contentPanelVisibilityHidden {
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.contentPanelVisibilityVisible {
+    z-index: 1;
+}
+
+.contentInner {
+}
+
+.contentInner > * {
+    padding-top: 1rem;
+}
