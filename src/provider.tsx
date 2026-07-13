@@ -1,252 +1,154 @@
-import {
-    BiasProvider as LitBiasProvider,
-    type BiasContextValue,
-    type BiasStoreSnapshot,
-    type CheckoutSession,
-    type FieldValueMap,
-    type FrameFieldType,
-    type PaymentMethodType,
-    type UnifiedFieldState,
-    type ValueFieldStatus,
-    type ValueFieldType,
-    type ValueFieldValidator,
-} from "@biaspay/web";
+import { BiasController as CoreBiasController, type ElementsController } from "@biaspay/elements";
 import {
     createContext,
     createEffect,
     createMemo,
     createSignal,
     onCleanup,
+    onMount,
     Show,
+    untrack,
     useContext,
     type Accessor,
-    type JSX,
-    type ParentProps,
 } from "solid-js";
-import { createWrapper } from "./create-wrapper";
+import type {
+    Appearance,
+    BiasFieldName,
+    BiasFieldState,
+    BiasFieldValidator,
+    BiasFieldValueMap,
+    BiasProviderProps,
+    UseBiasResult,
+} from "./public-types";
 
-export type {
-    BiasContextValue,
-    BiasStoreSnapshot,
-    CheckoutSession,
-    FieldValueMap,
-    FrameFieldType,
-    PaymentMethodType,
-    UnifiedFieldState,
-    ValueFieldStatus,
-    ValueFieldType,
-    ValueFieldValidator,
-};
-
-const BiasProviderElement = createWrapper({
-    tagName: "bias-provider",
-    elementClass: LitBiasProvider,
-    events: {
-        onComplete: "complete",
-    },
-}) as (props: {
-    ref?: (element: LitBiasProvider | null) => void;
-    children?: JSX.Element;
-    clientSecret: string;
-    previewSession?: CheckoutSession;
-    apiBaseUrl?: string;
-    frameUrl?: string;
-    onComplete?: () => void;
-}) => JSX.Element;
-
-type BiasContextAccessor = () => BiasContextValue;
-
-const BiasContext = createContext<BiasContextAccessor>();
-
-type BiasProviderProps = ParentProps & {
-    clientSecret: string | Accessor<string>;
-    _previewSession?: CheckoutSession;
-    apiBaseUrl?: string;
-    frameUrl?: string;
-    onComplete?: () => void;
-};
-
-function resolveClientSecret(clientSecret: string | Accessor<string>): string {
-    return typeof clientSecret === "function" ? clientSecret() : clientSecret;
+class SolidBiasController {
+    readonly core: ElementsController;
+    private readonly track: Accessor<number>;
+    readonly appearance: Accessor<Appearance | undefined>;
+    constructor(
+        config: ConstructorParameters<typeof CoreBiasController>[0],
+        appearance: Accessor<Appearance | undefined>,
+    ) {
+        this.core = new CoreBiasController(config);
+        this.appearance = appearance;
+        const [track, dirty] = createSignal(0, { equals: false });
+        this.track = track;
+        this.core.subscribe(() => dirty((value) => value + 1));
+    }
+    state() {
+        this.track();
+        return this.core.getPublicState();
+    }
 }
 
+const BiasContext = createContext<SolidBiasController>();
+
 export function BiasProvider(props: BiasProviderProps) {
-    const [ready, setReady] = createSignal(false);
-    const clientSecret = createMemo(() => resolveClientSecret(props.clientSecret));
-    let unsubscribe: (() => void) | undefined;
-    let currentContext: BiasContextValue | undefined;
-    let disposed = false;
+    const controller = untrack(
+        () =>
+            new SolidBiasController(
+                {
+                    clientSecret: props.clientSecret,
+                    initialCheckoutSession: props.initialCheckoutSession,
+                    appearance: props.appearance,
+                    onComplete: props.onComplete,
+                },
+                () => props.appearance,
+            ),
+    );
+    const [mounted, setMounted] = createSignal(false);
 
-    const getCurrentContext: BiasContextAccessor = () => {
-        if (!currentContext) {
-            throw new Error("Bias components must be used within <BiasProvider />");
-        }
-        return currentContext;
-    };
-
-    const updateReady = (value: boolean) => {
-        queueMicrotask(() => {
-            if (!disposed) setReady(value);
-        });
-    };
-
-    onCleanup(() => {
-        disposed = true;
-        unsubscribe?.();
+    onMount(() => {
+        controller.core.activate();
+        setMounted(true);
     });
+    onCleanup(() => controller.core.deactivate());
 
-    const onProviderRef = (element: LitBiasProvider | null | undefined) => {
-        unsubscribe?.();
-        unsubscribe = undefined;
-
-        if (!element) {
-            currentContext = undefined;
-            updateReady(false);
+    let initial = true;
+    createEffect(() => {
+        const config = {
+            clientSecret: props.clientSecret,
+            initialCheckoutSession: props.initialCheckoutSession,
+            appearance: props.appearance,
+            onComplete: props.onComplete,
+        };
+        if (initial) {
+            initial = false;
             return;
         }
+        controller.core.updateConfig(config);
+    });
 
-        const refresh = () => {
-            currentContext = element.getContextValue();
-            updateReady(true);
-        };
-        refresh();
-        unsubscribe = element.getContextValue().subscribe(refresh);
+    const terminalError = createMemo(() => {
+        const state = controller.state().sessionState;
+        return state.status === "error" && !state.session ? state.error : undefined;
+    });
+    createEffect(() => {
+        const error = terminalError();
+        if (error) throw error;
+    });
+    const visible = () => {
+        if (!mounted()) return false;
+        const state = controller.state().sessionState;
+        return (state.status !== "idle" && state.status !== "loading") || "session" in state;
     };
 
     return (
-        <BiasContext value={getCurrentContext}>
-            <BiasProviderElement
-                ref={onProviderRef}
-                clientSecret={clientSecret()}
-                previewSession={props._previewSession}
-                apiBaseUrl={props.apiBaseUrl}
-                frameUrl={props.frameUrl}
-                onComplete={props.onComplete}
-            >
-                <Show when={ready()}>{props.children}</Show>
-            </BiasProviderElement>
-        </BiasContext>
+        <BiasContext.Provider value={controller}>
+            <Show when={visible()}>
+                <bias-provider prop:controller={controller.core} prop:appearance={props.appearance}>
+                    {props.children}
+                </bias-provider>
+            </Show>
+        </BiasContext.Provider>
     );
 }
 
-export function useBiasContext(): BiasContextValue {
-    const getContext = useContext(BiasContext);
-    if (!getContext) {
-        throw new Error("Bias components must be used within <BiasProvider />");
-    }
-    return getContext();
+function useBiasController(): SolidBiasController {
+    const controller = useContext(BiasContext);
+    if (!controller) throw new Error("Bias components must be used within <BiasProvider />");
+    return controller;
 }
 
-function useBiasSnapshot(): Accessor<BiasStoreSnapshot> {
-    const ctx = useBiasContext();
-    const [snapshot, setSnapshot] = createSignal(ctx.getSnapshot());
-
-    createEffect(
-        () => ctx,
-        (value) => {
-            setSnapshot(value.getSnapshot());
-            return value.subscribe(() => setSnapshot(value.getSnapshot()));
-        },
-    );
-
-    return snapshot;
-}
-
-export function useFieldState(): Accessor<UnifiedFieldState> {
-    const snapshot = useBiasSnapshot();
-    return () => snapshot().fieldState;
-}
-
-export function useField<K extends ValueFieldType>(
-    type: K,
-    options?: { validate?: ValueFieldValidator<K> },
-) {
-    const ctx = useBiasContext();
-    const snapshot = useBiasSnapshot();
-
-    createEffect(
-        () => options?.validate,
-        (validator) => {
-            if (!validator) return;
-            ctx.store.registerFieldValidator(type, validator);
-            return () => ctx.store.unregisterFieldValidator(type);
-        },
-    );
-
+export function useBias(): UseBiasResult {
+    const controller = useBiasController();
     return {
-        state: () => snapshot().fieldState[type],
-        value: () => snapshot().fieldState[type].value,
-        setValue: (value: FieldValueMap[K]) => ctx.store.setFieldValue(type, value),
-        validate: () => ctx.store.validateField(type),
-        setState: (nextState: Partial<ValueFieldStatus<FieldValueMap[K]>>) =>
-            ctx.store.setValueFieldState(type, nextState),
+        sessionState: () => controller.state().sessionState,
+        paymentMethod: () => controller.state().paymentMethod,
+        setPaymentMethod: (method) => controller.core.setPaymentMethod(method),
+        status: () => controller.state().status,
+        canSubmit: () => controller.state().canSubmit,
+        submissionError: () => controller.state().submissionError,
+        submit: () => controller.core.submit(),
+        refreshSession: () => controller.core.refreshSession(),
     };
 }
 
-export function useAttemptPayment() {
-    const ctx = useBiasContext();
-    return () => {
-        ctx.store.attemptPayment({
-            triggerFrameValidation: (type) => ctx.attemptPayments[type]?.(),
-        });
-    };
-}
-
-export function useIsSubmittable(): Accessor<boolean> {
-    const snapshot = useBiasSnapshot();
-    const ctx = useBiasContext();
-    return () => {
-        const current = snapshot();
-        return (
-            !!current.selectedPaymentMethod &&
-            ctx.store.getRequiredFrameFields().every((f) => !!current.encryptedFields[f]) &&
-            ctx.store.getRequiredValueFields().every((f) => current.fieldState[f].valid)
-        );
-    };
-}
-
-export function useSubmitState() {
-    const snapshot = useBiasSnapshot();
+export function useBiasField<K extends BiasFieldName>(
+    name: K,
+    options?: { validate?: BiasFieldValidator<K> },
+): {
+    state: Accessor<BiasFieldState<BiasFieldValueMap[K]>>;
+    setValue(value: BiasFieldValueMap[K]): void;
+    validate(): void;
+    onFocus(): void;
+    onBlur(): void;
+} {
+    const controller = useBiasController();
+    const binding = controller.core.getField(name) as ReturnType<ElementsController["getField"]>;
+    createEffect(() => {
+        const validator = options?.validate;
+        if (!validator) return;
+        onCleanup(binding.setValidator(validator as never));
+    });
     return {
-        loading: () => snapshot().submitLoading,
-        success: () => snapshot().submitSuccess,
+        state: () => {
+            controller.state();
+            return binding.state as BiasFieldState<BiasFieldValueMap[K]>;
+        },
+        setValue: (value) => binding.setValue(value as never),
+        validate: binding.validate,
+        onFocus: binding.onFocus,
+        onBlur: binding.onBlur,
     };
 }
-
-export function usePaymentError(): Accessor<string | null> {
-    const snapshot = useBiasSnapshot();
-    return () => snapshot().paymentError;
-}
-
-export function useSelectedPaymentMethod(): Accessor<PaymentMethodType> {
-    const snapshot = useBiasSnapshot();
-    return () => snapshot().selectedPaymentMethod;
-}
-
-export function useSetSelectedPaymentMethod() {
-    const ctx = useBiasContext();
-    return ctx.store.setSelectedPaymentMethod;
-}
-
-export function useClientSecret(): Accessor<string> {
-    const ctx = useBiasContext();
-    return () => ctx.clientSecret;
-}
-
-export function useOnComplete(callback: () => void) {
-    const ctx = useBiasContext();
-    createEffect(
-        () => callback,
-        (listener) => {
-            ctx.completeListeners.add(listener);
-            onCleanup(() => ctx.completeListeners.delete(listener));
-        },
-    );
-}
-
-export function useCheckoutSession(): Accessor<CheckoutSession | undefined> {
-    const ctx = useBiasContext();
-    return () => ctx.checkoutSession;
-}
-
-export { themeVariableStyle as useThemeVariables, type ThemeVariables } from "@biaspay/web";

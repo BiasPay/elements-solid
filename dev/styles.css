@@ -1,25 +1,39 @@
 body {
     margin: 0;
-
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    background: #fff;
+    font-family: system-ui, sans-serif;
+    color: #111827;
 }
 
-* {
-    font-family:
-        "SF Pro",
-        -apple-system,
-        "Segoe UI",
-        "Roboto",
-        "Oxygen",
-        "Ubuntu",
-        "Cantarell",
-        "Fira Sans",
-        "Droid Sans",
-        "Helvetica Neue",
-        sans-serif;
+.page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 4rem 1.5rem 2rem;
 }
 
-code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+.preview {
+    width: min(100%, 420px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section-heading {
+    margin: 0 0 -0.25rem 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+@media (min-width: 720px) {
+    .page {
+        padding-right: 24rem;
+    }
 }

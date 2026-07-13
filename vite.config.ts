@@ -5,9 +5,8 @@ import solidPlugin from "vite-plugin-solid";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const srcDir = path.resolve(rootDir, "src");
-const entryFile = path.resolve(srcDir, "index.tsx");
 
-type BuildKind = "production" | "development";
+type BuildKind = "production" | "server";
 
 function createLibraryConfig({
     kind,
@@ -15,10 +14,11 @@ function createLibraryConfig({
     emptyOutDir,
 }: {
     kind: BuildKind;
-    fileName: "index.js" | "dev.js";
+    fileName: "index.js" | "server.js";
     emptyOutDir: boolean;
 }): UserConfig {
-    const isDevelopment = kind === "development";
+    const isServer = kind === "server";
+    const entryFile = path.resolve(srcDir, isServer ? "server.ts" : "index.tsx");
 
     return {
         resolve: {
@@ -28,16 +28,14 @@ function createLibraryConfig({
         },
         plugins: [solidPlugin()],
         define: {
-            "process.env.NODE_ENV": JSON.stringify(isDevelopment ? "development" : "production"),
-            "process.env.PROD": JSON.stringify(!isDevelopment),
-            "process.env.DEV": JSON.stringify(isDevelopment),
-            "process.env.SSR": "false",
-            "import.meta.env.NODE_ENV": JSON.stringify(
-                isDevelopment ? "development" : "production",
-            ),
-            "import.meta.env.PROD": JSON.stringify(!isDevelopment),
-            "import.meta.env.DEV": JSON.stringify(isDevelopment),
-            "import.meta.env.SSR": "false",
+            "process.env.NODE_ENV": JSON.stringify("production"),
+            "process.env.PROD": JSON.stringify(true),
+            "process.env.DEV": JSON.stringify(false),
+            "process.env.SSR": JSON.stringify(isServer),
+            "import.meta.env.NODE_ENV": JSON.stringify("production"),
+            "import.meta.env.PROD": JSON.stringify(true),
+            "import.meta.env.DEV": JSON.stringify(false),
+            "import.meta.env.SSR": JSON.stringify(isServer),
         },
         build: {
             outDir: "dist",
@@ -51,7 +49,7 @@ function createLibraryConfig({
                 fileName: () => fileName,
             },
             rollupOptions: {
-                external: ["solid-js", "@solidjs/web", "@biaspay/web"],
+                external: ["solid-js", "solid-js/web", "@biaspay/sdk", "@biaspay/elements"],
                 output: {
                     entryFileNames: () => fileName,
                 },
@@ -61,11 +59,11 @@ function createLibraryConfig({
 }
 
 export default defineConfig(({ mode }) => {
-    const isDevelopment = mode === "development";
+    const isServer = mode === "server";
 
     return createLibraryConfig({
-        kind: isDevelopment ? "development" : "production",
-        fileName: isDevelopment ? "dev.js" : "index.js",
-        emptyOutDir: !isDevelopment,
+        kind: isServer ? "server" : "production",
+        fileName: isServer ? "server.js" : "index.js",
+        emptyOutDir: !isServer,
     });
 });

@@ -2,24 +2,22 @@ import path from "node:path";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 
-const elementsSrc = path.resolve(__dirname, "../../lit/src");
-const elementsCoreSrc = path.resolve(__dirname, "../../core/src");
-
+// `@biaspay/elements` ships pre-compiled JS with styles injected at import time,
+// so the dev app consumes it like any published package — no Svelte compiler
+// here, exactly as a real Solid consumer would have.
 export default defineConfig({
     envDir: __dirname,
     resolve: {
         alias: {
             src: path.resolve(__dirname, "../src"),
-            "~": elementsSrc,
-            "@biaspay/web/styles.css": path.resolve(elementsSrc, "styles/styles.css"),
-            "@biaspay/web": path.resolve(elementsSrc, "index.ts"),
-            "@biaspay/elements-core": path.resolve(elementsCoreSrc, "index.ts"),
         },
+        // Ensure a single Solid copy (dev app + package source).
+        dedupe: ["solid-js"],
     },
     plugins: [
         solidPlugin(),
         {
-            name: "Reaplace env variables",
+            name: "Replace env variables",
             transform(code, id) {
                 if (id.includes("node_modules")) {
                     return code;
@@ -37,7 +35,7 @@ export default defineConfig({
         },
     ],
     server: {
-        port: 3000,
+        port: 3006,
     },
     build: {
         target: "esnext",

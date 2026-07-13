@@ -39,9 +39,7 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             alias: {
-                "~/components": path.resolve(__dirname, "src/components.ts"),
                 "~/provider": path.resolve(__dirname, "src/provider.tsx"),
-                "~": path.resolve(__dirname, "src"),
             },
             conditions: testSSR ? ["node"] : ["browser", "development"],
         },

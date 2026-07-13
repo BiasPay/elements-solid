@@ -1,8 +1,7 @@
-import "@biaspay/web";
-import { flush } from "solid-js";
-
 export async function settleBiasElements(_container: HTMLElement) {
-    flush();
+    // Svelte custom elements create their inner component on the tick after
+    // connectedCallback; allow the provider and leaf upgrade queues to drain.
     await Promise.resolve();
-    flush();
+    await Promise.resolve();
+    await Promise.resolve();
 }

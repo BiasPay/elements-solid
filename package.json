@@ -1,21 +1,20 @@
 {
     "name": "@biaspay/solid",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "private": false,
-    "description": "SolidJS SDK for Bias Elements",
+    "description": "Solid SDK for Bias Elements",
     "keywords": [
         "solid"
     ],
     "homepage": "https://biaspay.com",
     "bugs": {
-        "url": "https://github.com/{{me}}/{{name_of_lib}}/issues"
+        "url": "https://github.com/BiasPay/elements-solid/issues"
     },
     "license": "MIT",
     "author": "Bias",
-    "contributors": [],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/{{me}}/{{name_of_lib}}.git"
+        "url": "git+https://github.com/BiasPay/elements-solid.git"
     },
     "files": [
         "dist"
@@ -23,14 +22,16 @@
     "type": "module",
     "main": "./dist/index.js",
     "module": "./dist/index.js",
-    "browser": {},
     "types": "./dist/index.d.ts",
-    "typesVersions": {},
     "exports": {
+        "node": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/server.js"
+        },
         "development": {
             "import": {
                 "types": "./dist/index.d.ts",
-                "default": "./dist/dev.js"
+                "default": "./dist/index.js"
             }
         },
         "import": {
@@ -40,25 +41,26 @@
     },
     "scripts": {
         "dev": "vite serve --config dev/vite.config.ts dev --port 3006",
-        "build": "bun run --cwd ../lit build && vite build && vite build --mode development && tsc -p tsconfig.build.json",
-        "test": "concurrently \"bun run test:client\" \"bun run test:ssr\"",
+        "build": "vite build && vite build --mode server && tsc -p tsconfig.build.json",
+        "test": "bun run build && concurrently \"bun run test:client\" \"bun run test:ssr\" \"node test/package-ssr.mjs\"",
         "test:client": "vitest",
         "test:ssr": "vitest --mode ssr",
+        "test:package-ssr": "bun run build && node test/package-ssr.mjs",
         "prepublishOnly": "bun run build",
-        "format": "bun oxfmt -c ../../../oxfmt.config.ts --write .",
+        "format": "bun oxfmt --write .",
         "lint": "concurrently \"bun run lint:code\" \"bun run lint:types\"",
         "lint:code": "bunx oxlint . --deny-warnings",
         "lint:fix": "bun oxlint --fix . && bun format",
-        "lint:types": "tsc --noEmit",
+        "lint:types": "tsc --noEmit && tsc --noEmit -p tsconfig.test-types.json",
         "update-deps": "bun update"
     },
     "dependencies": {
-        "@biaspay/web": "workspace:*"
+        "@biaspay/elements": "0.0.1",
+        "@biaspay/sdk": "1.0.1"
     },
     "devDependencies": {
-        "@biaspay/server": "workspace:*",
-        "@solidjs/web": "2.0.0-beta.7",
-        "@steeze-ui/heroicons": "^2.4.2",
+        "@tweakpane/core": "1.1.9",
+        "@tweakpane/plugin-essentials": "0.1.8",
         "@types/node": "^25.9.3",
         "@vitest/browser": "^4.1.8",
         "@vitest/browser-playwright": "^4.1.8",
@@ -66,20 +68,21 @@
         "esbuild": "^0.28.1",
         "jsdom": "^29.1.1",
         "oxfmt": "^0.54.0",
+        "oxlint": "^1.59.0",
         "playwright": "^1.60.0",
-        "solid-js": "2.0.0-beta.7",
+        "solid-js": "^1.9.14",
+        "solid-tweakpane": "^0.6.1",
+        "tweakpane": "3.1.10",
         "typescript": "^6.0.3",
         "vite": "^7.3.5",
-        "vite-plugin-solid": "^3.0.0-next.5",
+        "vite-plugin-solid": "^2.11.12",
         "vitest": "^4.1.8"
     },
     "peerDependencies": {
-        "@solidjs/web": "2.0.0-beta.7",
-        "solid-js": "2.0.0-beta.7"
+        "solid-js": "^1.9.14"
     },
     "overrides": {
-        "@solidjs/web": "2.0.0-beta.7",
-        "solid-js": "2.0.0-beta.7"
+        "solid-js": "^1.9.14"
     },
     "engines": {
         "bun": ">=1.3.11",

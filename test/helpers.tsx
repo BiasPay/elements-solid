@@ -2,18 +2,19 @@
  * Solid test helpers — provides a mock BiasProvider wrapper
  * and a render utility that returns a container element.
  */
-import { act } from "@testing-library/react";
-import { flush, type JSX } from "solid-js";
-import { render } from "@solidjs/web";
-import type { CheckoutSession } from "@biaspay/server";
+import type { JSX } from "solid-js";
+import { render } from "solid-js/web";
+import type { CheckoutSession } from "@biaspay/sdk";
+import type { Appearance } from "../src";
 import { BiasProvider } from "../src";
-import { createMockSession } from "../../test-shared/mocks";
+import { createMockSession } from "./fixtures/mocks";
 import { settleBiasElements } from "./setup";
 
 type WrapperOptions = {
     session?: CheckoutSession;
     clientSecret?: string;
     onComplete?: () => void;
+    appearance?: Appearance | (() => Appearance);
 };
 
 type RenderResult = {
@@ -26,41 +27,29 @@ export async function renderWithProvider(
     options: WrapperOptions = {},
 ): Promise<RenderResult> {
     const session = options.session ?? createMockSession();
-    const clientSecret = options.clientSecret ?? "cs_test_secret";
+    const clientSecret = options.clientSecret ?? session.client_secret;
     const container = document.createElement("div");
-    let dispose!: () => void;
+    document.body.append(container);
+    const dispose = render(
+        () => (
+            <BiasProvider
+                clientSecret={clientSecret}
+                initialCheckoutSession={session}
+                onComplete={options.onComplete}
+                appearance={
+                    typeof options.appearance === "function"
+                        ? options.appearance()
+                        : options.appearance
+                }
+            >
+                {ui()}
+            </BiasProvider>
+        ),
+        container,
+    );
+    await settleBiasElements(container);
 
-    await act(async () => {
-        dispose = render(
-            () => (
-                <BiasProvider
-                    clientSecret={clientSecret}
-                    _previewSession={session}
-                    onComplete={options.onComplete}
-                >
-                    {ui()}
-                </BiasProvider>
-            ),
-            container,
-        );
-        flush();
-        await settleBiasElements(container);
-    });
-
-    return { container, dispose };
-}
-
-export async function renderComponent(ui: () => JSX.Element): Promise<RenderResult> {
-    const container = document.createElement("div");
-    let dispose!: () => void;
-
-    await act(async () => {
-        dispose = render(ui, container);
-        flush();
-        await settleBiasElements(container);
-    });
-
-    return { container, dispose };
+    return { container, dispose: () => { dispose(); container.remove(); } };
 }
 
 /**
@@ -72,30 +61,31 @@ export async function withProvider<T>(
     options: WrapperOptions = {},
 ): Promise<{ result: T; dispose: () => void }> {
     const session = options.session ?? createMockSession();
-    const clientSecret = options.clientSecret ?? "cs_test_secret";
+    const clientSecret = options.clientSecret ?? session.client_secret;
     const container = document.createElement("div");
+    document.body.append(container);
     let result!: T;
-    let dispose!: () => void;
+    const dispose = render(
+        () => (
+            <BiasProvider
+                clientSecret={clientSecret}
+                initialCheckoutSession={session}
+                onComplete={options.onComplete}
+                appearance={
+                    typeof options.appearance === "function"
+                        ? options.appearance()
+                        : options.appearance
+                }
+            >
+                {(() => {
+                    result = fn();
+                    return null;
+                })()}
+            </BiasProvider>
+        ),
+        container,
+    );
+    await settleBiasElements(container);
 
-    await act(async () => {
-        dispose = render(
-            () => (
-                <BiasProvider
-                    clientSecret={clientSecret}
-                    _previewSession={session}
-                    onComplete={options.onComplete}
-                >
-                    {(() => {
-                        result = fn();
-                        return null;
-                    })()}
-                </BiasProvider>
-            ),
-            container,
-        );
-        flush();
-        await settleBiasElements(container);
-    });
-
-    return { result, dispose };
+    return { result, dispose: () => { dispose(); container.remove(); } };
 }
