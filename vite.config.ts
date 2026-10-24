@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig, type UserConfig } from "vite";
+import { defineConfig, loadEnv, type UserConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
@@ -12,10 +12,12 @@ function createLibraryConfig({
     kind,
     fileName,
     emptyOutDir,
+    allowedHosts,
 }: {
     kind: BuildKind;
     fileName: "index.js" | "server.js";
     emptyOutDir: boolean;
+    allowedHosts: string[];
 }): UserConfig {
     const isServer = kind === "server";
     const entryFile = path.resolve(srcDir, isServer ? "server.ts" : "index.tsx");
@@ -27,6 +29,9 @@ function createLibraryConfig({
             },
         },
         plugins: [solidPlugin()],
+        server: {
+            allowedHosts,
+        },
         define: {
             "process.env.NODE_ENV": JSON.stringify("production"),
             "process.env.PROD": JSON.stringify(true),
@@ -60,10 +65,16 @@ function createLibraryConfig({
 
 export default defineConfig(({ mode }) => {
     const isServer = mode === "server";
+    const remoteDevelopmentHost = loadEnv(
+        mode,
+        path.resolve(rootDir, "../../.."),
+        "",
+    ).REMOTE_DEVELOPMENT_URL;
 
     return createLibraryConfig({
         kind: isServer ? "server" : "production",
         fileName: isServer ? "server.js" : "index.js",
         emptyOutDir: !isServer,
+        allowedHosts: remoteDevelopmentHost ? [remoteDevelopmentHost] : [],
     });
 });

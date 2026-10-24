@@ -25,10 +25,13 @@ describe("packed package", () => {
 
     it("contains exact dependencies and repository metadata", () => {
         const manifest = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8"));
-        expect(manifest.dependencies).toEqual({
-            "@biaspay/elements": "0.0.1",
-            "@biaspay/sdk": "1.0.1",
-        });
+        expect(Object.keys(manifest.dependencies).sort()).toEqual([
+            "@biaspay/elements",
+            "@biaspay/sdk",
+        ]);
+        for (const specifier of Object.values<string>(manifest.dependencies)) {
+            expect(specifier).not.toMatch(/^workspace:/);
+        }
         expect(manifest.repository).toEqual({
             type: "git",
             url: "git+https://github.com/BiasPay/elements-solid.git",

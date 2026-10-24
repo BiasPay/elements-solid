@@ -6,6 +6,7 @@ export const AddressElement: Component<AddressElementProps> = (props) => (
     <bias-address-element
         prop:scope={props.scope}
         prop:collectPhone={props.collectPhone}
+        prop:allowedCountries={props.allowedCountries}
         prop:appearance={props.appearance}
     />
 );

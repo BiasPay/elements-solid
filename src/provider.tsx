@@ -50,6 +50,12 @@ export function BiasProvider(props: BiasProviderProps) {
                 {
                     clientSecret: props.clientSecret,
                     initialCheckoutSession: props.initialCheckoutSession,
+                    preview: props.preview,
+                    checkoutSessionExpand: props.checkoutSessionExpand,
+                    defaultValues: props.defaultValues,
+                    rememberDetails: props.rememberDetails,
+                    savedPaymentMethods: props.savedPaymentMethods,
+                    apiBaseUrl: props.apiBaseUrl,
                     appearance: props.appearance,
                     onComplete: props.onComplete,
                 },
@@ -69,6 +75,12 @@ export function BiasProvider(props: BiasProviderProps) {
         const config = {
             clientSecret: props.clientSecret,
             initialCheckoutSession: props.initialCheckoutSession,
+            preview: props.preview,
+            checkoutSessionExpand: props.checkoutSessionExpand,
+            defaultValues: props.defaultValues,
+            rememberDetails: props.rememberDetails,
+            savedPaymentMethods: props.savedPaymentMethods,
+            apiBaseUrl: props.apiBaseUrl,
             appearance: props.appearance,
             onComplete: props.onComplete,
         };
@@ -114,13 +126,22 @@ export function useBias(): UseBiasResult {
     const controller = useBiasController();
     return {
         sessionState: () => controller.state().sessionState,
+        discountCodeState: () => controller.state().discountCodeState,
+        detailsSaveState: () => controller.state().detailsSaveState,
         paymentMethod: () => controller.state().paymentMethod,
+        walletAvailability: () => controller.state().walletAvailability,
+        savedPaymentMethods: () => controller.state().savedPaymentMethods,
+        savedPaymentMethod: () => controller.state().savedPaymentMethod,
         setPaymentMethod: (method) => controller.core.setPaymentMethod(method),
+        setSavedPaymentMethod: (id) => controller.core.setSavedPaymentMethod(id),
+        clearRememberedDetails: () => controller.core.clearRememberedDetails(),
         status: () => controller.state().status,
         canSubmit: () => controller.state().canSubmit,
         submissionError: () => controller.state().submissionError,
         submit: () => controller.core.submit(),
         refreshSession: () => controller.core.refreshSession(),
+        updateCheckoutSession: (params) => controller.core.updateCheckoutSession(params),
+        retryDetailsSave: () => controller.core.retryDetailsSave(),
     };
 }
 

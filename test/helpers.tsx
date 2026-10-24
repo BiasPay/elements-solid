@@ -8,7 +8,7 @@ import type { CheckoutSession } from "@biaspay/sdk";
 import type { Appearance } from "../src";
 import { BiasProvider } from "../src";
 import { createMockSession } from "./fixtures/mocks";
-import { settleBiasElements } from "./setup";
+import { setMockCheckoutSession, settleBiasElements } from "./setup";
 
 type WrapperOptions = {
     session?: CheckoutSession;
@@ -28,13 +28,13 @@ export async function renderWithProvider(
 ): Promise<RenderResult> {
     const session = options.session ?? createMockSession();
     const clientSecret = options.clientSecret ?? session.client_secret;
+    setMockCheckoutSession(session);
     const container = document.createElement("div");
     document.body.append(container);
     const dispose = render(
         () => (
             <BiasProvider
                 clientSecret={clientSecret}
-                initialCheckoutSession={session}
                 onComplete={options.onComplete}
                 appearance={
                     typeof options.appearance === "function"
@@ -49,7 +49,13 @@ export async function renderWithProvider(
     );
     await settleBiasElements(container);
 
-    return { container, dispose: () => { dispose(); container.remove(); } };
+    return {
+        container,
+        dispose: () => {
+            dispose();
+            container.remove();
+        },
+    };
 }
 
 /**
@@ -62,6 +68,7 @@ export async function withProvider<T>(
 ): Promise<{ result: T; dispose: () => void }> {
     const session = options.session ?? createMockSession();
     const clientSecret = options.clientSecret ?? session.client_secret;
+    setMockCheckoutSession(session);
     const container = document.createElement("div");
     document.body.append(container);
     let result!: T;
@@ -69,7 +76,6 @@ export async function withProvider<T>(
         () => (
             <BiasProvider
                 clientSecret={clientSecret}
-                initialCheckoutSession={session}
                 onComplete={options.onComplete}
                 appearance={
                     typeof options.appearance === "function"
@@ -87,5 +93,11 @@ export async function withProvider<T>(
     );
     await settleBiasElements(container);
 
-    return { result, dispose: () => { dispose(); container.remove(); } };
+    return {
+        result,
+        dispose: () => {
+            dispose();
+            container.remove();
+        },
+    };
 }

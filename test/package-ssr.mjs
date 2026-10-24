@@ -6,7 +6,10 @@ import {
     BiasProvider,
     CardElement,
     ContactElement,
+    DiscountCodeElement,
+    ExpressCheckoutElement,
     PaymentElement,
+    RememberDetailsCheckbox,
     SubmitButton,
 } from "@biaspay/solid";
 
@@ -15,10 +18,16 @@ for (const Component of [
     USBankAccountElement,
     CardElement,
     ContactElement,
+    DiscountCodeElement,
+    ExpressCheckoutElement,
     PaymentElement,
+    RememberDetailsCheckbox,
     SubmitButton,
 ]) {
-    assert.equal(renderToString(() => Component({})), "");
+    assert.equal(
+        renderToString(() => Component({})),
+        "",
+    );
 }
 
 assert.equal(

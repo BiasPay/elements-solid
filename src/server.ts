@@ -10,7 +10,10 @@ import type {
     BiasProviderProps,
     CardElementProps,
     ContactElementProps,
+    DiscountCodeElementProps,
+    ExpressCheckoutElementProps,
     PaymentElementProps,
+    RememberDetailsCheckboxProps,
     SubmitButtonProps,
     UseBiasResult,
 } from "./public-types";
@@ -19,12 +22,16 @@ import type {
 // custom elements, which must never be evaluated during SSR.
 const EmptyComponent: Component<Record<string, unknown>> = () => undefined;
 
-export const BiasProvider = ((_props: BiasProviderProps): JSX.Element => undefined) as Component<BiasProviderProps>;
+export const BiasProvider = ((_props: BiasProviderProps): JSX.Element =>
+    undefined) as Component<BiasProviderProps>;
 export const PaymentElement = EmptyComponent as Component<PaymentElementProps>;
+export const ExpressCheckoutElement = EmptyComponent as Component<ExpressCheckoutElementProps>;
+export const RememberDetailsCheckbox = EmptyComponent as Component<RememberDetailsCheckboxProps>;
 export const CardElement = EmptyComponent as Component<CardElementProps>;
 export const USBankAccountElement = EmptyComponent as Component<USBankAccountElementProps>;
 export const AddressElement = EmptyComponent as Component<AddressElementProps>;
 export const ContactElement = EmptyComponent as Component<ContactElementProps>;
+export const DiscountCodeElement = EmptyComponent as Component<DiscountCodeElementProps>;
 export const SubmitButton = EmptyComponent as Component<SubmitButtonProps>;
 
 function clientOnly(): never {
@@ -64,6 +71,10 @@ export type {
     BiasProviderProps,
     CardElementProps,
     ContactElementProps,
+    DiscountCodeAction,
+    DiscountCodeElementProps,
+    DiscountCodeState,
+    ExpressCheckoutElementProps,
     PaymentElementProps,
     PaymentMethod,
     SessionState,

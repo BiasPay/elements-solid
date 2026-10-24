@@ -106,11 +106,10 @@ export function DevControls(props: Props) {
     });
 
     const showPaymentMethodControls = () => props.view() === "payment-form";
-    const paymentMethodCount = () =>
-        (props.cardEnabled() ? 1 : 0) + (props.bankEnabled() ? 1 : 0);
+    const paymentMethodCount = () => (props.cardEnabled() ? 1 : 0) + (props.bankEnabled() ? 1 : 0);
     const showListStyle = () => showPaymentMethodControls() && paymentMethodCount() > 1;
     const isAddressView = () => props.view() === "address-form";
-    const showPhone = () => isAddressView() || props.addressEnabled();
+    const showPhone = () => isAddressView() || props.shippingEnabled();
     const isSetup = () => props.sessionPreset() === "setup";
 
     return (
@@ -171,7 +170,7 @@ export function DevControls(props: Props) {
                         {showPhone() && (
                             <TWPInput
                                 key="collectPhone"
-                                params={{ label: "Collect phone" }}
+                                params={{ label: "Collect shipping phone" }}
                                 onChange={(e) => props.setCollectPhone(!!e.value)}
                             />
                         )}

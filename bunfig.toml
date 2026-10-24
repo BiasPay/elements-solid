@@ -1,0 +1,7 @@
+[lint]
+flavor = "oxlint"
+denyWarnings = true
+ignorePatterns = ["dist/**"]
+
+[lint.rules]
+no-unused-vars = "off"

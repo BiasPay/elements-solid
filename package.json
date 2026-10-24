@@ -1,6 +1,6 @@
 {
     "name": "@biaspay/solid",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "private": false,
     "description": "Solid SDK for Bias Elements",
     "keywords": [
@@ -42,41 +42,35 @@
     "scripts": {
         "dev": "vite serve --config dev/vite.config.ts dev --port 3006",
         "build": "vite build && vite build --mode server && tsc -p tsconfig.build.json",
+        "build:dev": "vite build --mode development && vite build --mode server && tsc -p tsconfig.build.json",
         "test": "bun run build && concurrently \"bun run test:client\" \"bun run test:ssr\" \"node test/package-ssr.mjs\"",
         "test:client": "vitest",
         "test:ssr": "vitest --mode ssr",
         "test:package-ssr": "bun run build && node test/package-ssr.mjs",
         "prepublishOnly": "bun run build",
-        "format": "bun oxfmt --write .",
-        "lint": "concurrently \"bun run lint:code\" \"bun run lint:types\"",
-        "lint:code": "bunx oxlint . --deny-warnings",
-        "lint:fix": "bun oxlint --fix . && bun format",
-        "lint:types": "tsc --noEmit && tsc --noEmit -p tsconfig.test-types.json",
         "update-deps": "bun update"
     },
     "dependencies": {
-        "@biaspay/elements": "0.0.1",
-        "@biaspay/sdk": "1.0.1"
+        "@biaspay/elements": "0.1.1",
+        "@biaspay/sdk": "2.0.0"
     },
     "devDependencies": {
-        "@tweakpane/core": "1.1.9",
-        "@tweakpane/plugin-essentials": "0.1.8",
-        "@types/node": "^25.9.3",
-        "@vitest/browser": "^4.1.8",
-        "@vitest/browser-playwright": "^4.1.8",
-        "concurrently": "^10.0.3",
-        "esbuild": "^0.28.1",
-        "jsdom": "^29.1.1",
-        "oxfmt": "^0.54.0",
-        "oxlint": "^1.59.0",
-        "playwright": "^1.60.0",
-        "solid-js": "^1.9.14",
+        "@tweakpane/core": "2.0.5",
+        "@tweakpane/plugin-essentials": "0.2.1",
+        "@types/node": "^26.6.4",
+        "@vitest/browser": "^5.0.3",
+        "@vitest/browser-playwright": "^5.0.3",
+        "concurrently": "^10.0.5",
+        "esbuild": "^0.28.2",
+        "jsdom": "^30.1.2",
+        "playwright": "^1.63.0",
+        "solid-js": "^1.9.16",
         "solid-tweakpane": "^0.6.1",
-        "tweakpane": "3.1.10",
-        "typescript": "^6.0.3",
-        "vite": "^7.3.5",
-        "vite-plugin-solid": "^2.11.12",
-        "vitest": "^4.1.8"
+        "tweakpane": "4.0.5",
+        "typescript": "^7.0.2",
+        "vite": "^8.3.3",
+        "vite-plugin-solid": "^2.11.14",
+        "vitest": "^5.0.3"
     },
     "peerDependencies": {
         "solid-js": "^1.9.14"
@@ -88,5 +82,5 @@
         "bun": ">=1.3.11",
         "node": ">=18"
     },
-    "packageManager": "bun@1.3.14"
+    "packageManager": "bun@1.4.2"
 }

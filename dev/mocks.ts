@@ -6,7 +6,7 @@ export function createMockSession(overrides: Partial<CheckoutSession> = {}): Che
         id: "cs_test_123",
         live: false,
         created_at: Date.now(),
-        amount: 5000,
+        total: 5000,
         amount_collected: 0,
         dual_pricing: null,
         client_details: null,

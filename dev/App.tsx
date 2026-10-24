@@ -5,6 +5,7 @@ import {
     BiasProvider,
     CardElement,
     ContactElement,
+    ExpressCheckoutElement,
     PaymentElement,
     SubmitButton,
     type Appearance,
@@ -75,6 +76,7 @@ export default function App() {
             return createMockSession({
                 ...base,
                 amount: 10_000,
+                total: 10_000,
                 dual_pricing: { rate: 3 },
             });
         }
@@ -84,6 +86,7 @@ export default function App() {
                 ...base,
                 mode: "setup",
                 amount: 0,
+                total: 0,
                 submit_label: "auto",
             });
         }
@@ -114,7 +117,9 @@ export default function App() {
         } catch (error) {
             if (requestId !== sessionRequestId) return;
             setClientSecret(undefined);
-            setSessionError(error instanceof Error ? error.message : "Failed to create checkout session");
+            setSessionError(
+                error instanceof Error ? error.message : "Failed to create checkout session",
+            );
         } finally {
             if (requestId === sessionRequestId) {
                 setSessionLoading(false);
@@ -170,20 +175,26 @@ export default function App() {
                     </Show>
                     <Show when={clientSecret()}>
                         {(secret) => (
-                            <BiasProvider
-                                clientSecret={secret()}
-                                initialCheckoutSession={useMockSession ? previewSession() : undefined}
-                            >
+                            <BiasProvider clientSecret={secret()}>
                                 <div class="form-stack">
                                     <Show
                                         when={view() === "address-form"}
                                         fallback={
                                             <>
+                                                <Show when={view() === "payment-form"}>
+                                                    <ExpressCheckoutElement
+                                                        showSeparator
+                                                        appearance={appearance()}
+                                                    />
+                                                </Show>
                                                 <ContactElement appearance={appearance()} />
                                                 <Show when={shippingEnabled()}>
-                                                    <h2 class="section-heading">Shipping address</h2>
+                                                    <h2 class="section-heading">
+                                                        Shipping address
+                                                    </h2>
                                                     <AddressElement
                                                         scope="shipping"
+                                                        collectPhone={collectPhone()}
                                                         appearance={appearance()}
                                                     />
                                                 </Show>
@@ -196,7 +207,9 @@ export default function App() {
                                                     <CardElement appearance={appearance()} />
                                                 </Show>
                                                 <Show when={view() === "bank-account-form"}>
-                                                    <USBankAccountElement appearance={appearance()} />
+                                                    <USBankAccountElement
+                                                        appearance={appearance()}
+                                                    />
                                                 </Show>
                                                 <Show when={view() === "payment-form"}>
                                                     <PaymentElement
@@ -210,6 +223,7 @@ export default function App() {
                                         }
                                     >
                                         <AddressElement
+                                            scope="shipping"
                                             collectPhone={collectPhone()}
                                             appearance={appearance()}
                                         />

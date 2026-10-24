@@ -6,7 +6,8 @@ export function createMockSession(overrides: Partial<CheckoutSession> = {}): Che
         id: "cs_test_123",
         live: false,
         created_at: Date.now(),
-        amount: 5000,
+        updated_at: Date.now(),
+        total: 5000,
         amount_collected: 0,
         currency: "USD",
         dual_pricing: null,
@@ -27,8 +28,8 @@ export function createMockSession(overrides: Partial<CheckoutSession> = {}): Che
 }
 
 export const createMockDualPricingSession = () =>
-    createMockSession({ amount: 10000, dual_pricing: { rate: 3 } });
+    createMockSession({ total: 10000, dual_pricing: { rate: 3 } });
 export const createMockMultiMethodSession = () =>
     createMockSession({ payment_method_types: ["card", "us_bank_account"] });
 export const createMockSetupSession = () =>
-    createMockSession({ mode: "setup", amount: 0, submit_label: "auto" });
+    createMockSession({ mode: "setup", total: 0, submit_label: "auto" });
