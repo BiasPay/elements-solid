@@ -1,6 +1,6 @@
 {
     "name": "@biaspay/solid",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "private": false,
     "description": "Solid SDK for Bias Elements",
     "keywords": [
@@ -76,7 +76,7 @@
         "solid-js": "^1.9.14"
     },
     "overrides": {
-        "solid-js": "^1.9.14"
+        "solid-js": "^1.9.16"
     },
     "engines": {
         "bun": ">=1.3.11",
